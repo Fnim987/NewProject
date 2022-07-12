@@ -30,7 +30,7 @@ jobs:
     - run:
         name: run playbook
         command: |
-          ansible-playbook -i inventory.txt mainremote.yml
+          ansible-playbook -i inventory mainremote.yml
 
 
 workflows:

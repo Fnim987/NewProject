@@ -2,19 +2,19 @@ version: 2.1
 orbs: 
   aws-cli: circleci/aws-cli@3.1.1
 jobs:
-  #create_infra:
-    #docker:
-    #-  image: amazon/aws-cli
-    #resource_class: medium
-    #steps:
-    #-  checkout
-    #- run:
-        #name: create CF Stack
-        #command: |
-          #aws cloudformation deploy \
-            #--template-file P3EC2Template.yml \
-            #--stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5} \
-            #--region us-east-1
+  create_infra:
+    docker:
+    -  image: amazon/aws-cli
+    resource_class: medium
+    steps:
+    -  checkout
+    - run:
+        name: create CF Stack
+        command: |
+          aws cloudformation deploy \
+            --template-file P3EC2Template.yml \
+            --stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5} \
+            --region us-east-1
   configure_infra:
     docker:
     - image: python:3.7-alpine3.11
@@ -30,7 +30,7 @@ jobs:
     - run:
         name: run playbook
         command: |
-          ansible-playbook -i inventory mainremote.yml
+          ansible-playbook -i inventory.txt mainremote.yml
 
 
 workflows:

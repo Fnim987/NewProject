@@ -1,6 +1,14 @@
 version: 2.1
 orbs: 
   aws-cli: circleci/aws-cli@3.1.1
+commands:
+  destroy_env:
+    steps:
+    - run:
+        name: destroy_env
+        when: on_fail
+        command: |
+          aws cloudformation delete-stack --stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5}
 jobs:
   create_infra:
     docker:
@@ -15,42 +23,17 @@ jobs:
             --template-file P3EC2Template.yml \
             --stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5} \
             --region us-east-1
-  configure_infra:
-    docker:
-    - image: python:3.11-rc-alpine
-    resource_class: medium
+  smoke_test:
+    docker: 
+    - image: amazon/aws-cli
     steps:
-    - checkout
-    - add_ssh_keys:
-        fingerprints: "c2:35:78:49:b6:bb:99:b2:2f:b1:88:34:c6:1b:6b:ca"
     - run:
-        name: ansible
-        command: |
-          apk add --update ansible
-    - run:
-        name: run playbook
-        command: |
-          ansible-playbook -i inventory.txt mainremote.yml
-  smoketest:
-    docker:
-    - image: alpine:latest
-    resource_class: medium
-    steps:
-    - run: apk add --update curl
-    - run:
-        name: smoke test
-        command: |
-          URL="https://blog.udacity.com/"
-          if curl -s --head ${URL}
-          then
-            return 0
-          else
-            return 1
-          fi
+        name: test
+        command: return 1
+    - destroy_env
 
 workflows:
-  template:
+  testsmoke:
     jobs:
-    #- create_infra
-    #- configure_infra
-    - smoketest
+    - create_infra
+    - smoke_test

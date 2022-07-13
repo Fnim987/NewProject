@@ -36,4 +36,5 @@ workflows:
   testsmoke:
     jobs:
     - create_infra
-    - smoke_test
+    - smoke_test:
+        requires: create_infra

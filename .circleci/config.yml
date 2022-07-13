@@ -7,7 +7,7 @@ jobs:
     -  image: amazon/aws-cli
     resource_class: medium
     steps:
-    -  checkout
+    - checkout
     - run:
         name: create CF Stack
         command: |
@@ -36,5 +36,5 @@ jobs:
 workflows:
   template:
     jobs:
-    #- create_infra
-    - configure_infra
+    - create_infra
+    #- configure_infra

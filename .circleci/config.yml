@@ -36,5 +36,7 @@ jobs:
 workflows:
   template:
     jobs:
-    - create_infra
-    #- configure_infra
+    - hold:
+        type: approval
+    #- create_infra
+    - configure_infra

@@ -33,7 +33,7 @@ jobs:
           ansible-playbook -i inventory.txt mainremote.yml
   smoketest:
     docker:
-      -image: alpine:latest
+    - image: alpine:latest
     resource_class: medium
     steps:
     - run: apk add --update curl

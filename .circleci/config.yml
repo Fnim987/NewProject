@@ -1,42 +1,23 @@
 version: 2.1
-orbs: 
+orbs:
   aws-cli: circleci/aws-cli@3.1.1
-commands:
-  destroy_env:
-    steps:
-    - run:
-        name: destroy_env
-        when: on_fail
-        command: |
-          aws cloudformation delete-stack --stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5}
 jobs:
-  create_infra:
+  create_and_deploy_front_end:
     docker:
-    -  image: amazon/aws-cli
-    resource_class: medium
+      - image: amazon/aws-cli
     steps:
-    -  checkout
-    - run:
-        name: create CF Stack
-        command: |
-          aws cloudformation deploy \
-            --template-file P3EC2Template.yml \
-            --stack-name Udacity-${CIRCLE_WORKFLOW_ID:0:5} \
+      - checkout
+      - run:
+          name: Execute bucket.yml - Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+            --template-file bucket.yml \
+            --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
+            --parameter-overrides MyBucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
             --region us-east-1
-  smoke_test:
-    docker: 
-    - image: amazon/aws-cli
-    steps:
-    - run:
-        name: test
-        command: return 1
-    - destroy_env
-
+      # Uncomment the step below if yoou wish to upload all contents of the current directory to the S3 bucket
+      # - run: aws s3 sync . s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7} --delete
 workflows:
-  testsmoke:
+  distro:
     jobs:
-    - create_infra
-    - smoke_test:
-        requires:
-        - create_infra
-
+    - create_and_deploy_front_end
